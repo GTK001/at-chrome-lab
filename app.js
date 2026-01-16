@@ -33,23 +33,47 @@ const material = new THREE.MeshPhysicalMaterial({
   clearcoatRoughness: 0.05
 });
 
-new GLTFLoader().load("3d/scooter.glb", gltf => {
-  scooter = gltf.scene;
+new GLTFLoader().load(
+  "3d/scooter.glb",
+  (gltf) => {
+    scooter = gltf.scene;
 
-  // ✅ ปรับตำแหน่ง + ขนาด (สำคัญมาก)
-  scooter.scale.set(1.5, 1.5, 1.5);
-  scooter.position.set(0, -0.8, 0);
+    // === 1. คำนวณขนาดโมเดลจริง ===
+    const box = new THREE.Box3().setFromObject(scooter);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
 
-  scooter.traverse(obj => {
-    if (obj.isMesh) {
-      obj.material = material;
-      obj.castShadow = true;
-      obj.receiveShadow = true;
-    }
-  });
+    // === 2. จัดโมเดลให้อยู่กลางโลก ===
+    scooter.position.x += scooter.position.x - center.x;
+    scooter.position.y += scooter.position.y - center.y;
+    scooter.position.z += scooter.position.z - center.z;
 
-  scene.add(scooter);
-});
+    // === 3. ปรับกล้องตามขนาดโมเดล ===
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    let cameraZ = Math.abs(maxDim / Math.tan(fov / 2));
+    cameraZ *= 1.4;
+
+    camera.position.set(0, maxDim * 0.6, cameraZ);
+    camera.lookAt(0, 0, 0);
+
+    // === 4. ใส่วัสดุให้เห็นชัด ===
+    scooter.traverse((obj) => {
+      if (obj.isMesh) {
+        obj.material = material;
+        obj.material.side = THREE.DoubleSide;
+      }
+    });
+
+    scene.add(scooter);
+    console.log("✅ Scooter loaded", size);
+  },
+  undefined,
+  (error) => {
+    console.error("❌ GLB Load Error", error);
+  }
+);
+
 
 
 function animate(){
