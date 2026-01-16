@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>สูตรงาน AT Chrome Lab</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1 style="padding:15px;">📂 สูตรงานทั้งหมด</h1>
+<div id="list" style="padding:15px;"></div>
+
+<script>
+const data = JSON.parse(localStorage.getItem("formulas")) || [];
+const list = document.getElementById("list");
+
+data.forEach(f=>{
+  list.innerHTML += `
+    <div style="margin-bottom:10px;">
+      <b>${f.date}</b><br>
+      ชิ้นส่วน: ${f.part}<br>
+      โหมด: ${f.mode}<br>
+      สี: #${f.color}
+      <hr>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>

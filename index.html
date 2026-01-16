@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>AT Chrome Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>AT Chrome Lab</h1>
+  <a href="formulas.html">📂 สูตรงานทั้งหมด</a>
+</header>
+
+<main>
+  <div id="canvas3d"></div>
+
+  <aside>
+    <h2>เลือกชิ้นส่วน</h2>
+    <button onclick="selectPart('tank')">ถัง</button>
+    <button onclick="selectPart('fairing')">แฟริ่ง</button>
+    <button onclick="selectPart('wheel')">ล้อ</button>
+
+    <h2>โหมดสี</h2>
+    <button onclick="setMode('metallic')">Metallic</button>
+    <button onclick="setMode('pearl')">Pearl</button>
+    <button onclick="setMode('chrome')">Chrome</button>
+
+    <h2>ปรับสี</h2>
+    <label>Hue <input id="hue" type="range" min="0" max="360" value="0"></label>
+    <label>Brightness <input id="bright" type="range" min="10" max="90" value="50"></label>
+    <label>Gloss <input id="gloss" type="range" min="0" max="100" value="80"></label>
+
+    <button onclick="captureImage()">📸 แคปรูป</button>
+    <button onclick="saveFormula()">💾 บันทึกสูตร</button>
+    <button onclick="sendLine()">📱 ส่ง LINE</button>
+  </aside>
+</main>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

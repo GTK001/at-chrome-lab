@@ -1,0 +1,108 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/GLTFLoader.js";
+
+let scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+
+let camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 1.2, 3);
+
+let renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(window.innerWidth - 280, window.innerHeight - 60);
+renderer.setPixelRatio(window.devicePixelRatio);
+document.getElementById("canvas3d").appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 1.2));
+const light = new THREE.DirectionalLight(0xffffff, 1.5);
+light.position.set(3,5,2);
+scene.add(light);
+
+let scooter;
+let parts = { tank:null, fairing:null, wheel:[] };
+let selectedPart = "tank";
+let mode = "metallic";
+
+const material = new THREE.MeshPhysicalMaterial({
+  color: 0xff0000,
+  metalness: 0.7,
+  roughness: 0.25,
+  clearcoat: 1,
+  clearcoatRoughness: 0.05
+});
+
+new GLTFLoader().load("3d/scooter.glb", gltf => {
+  scooter = gltf.scene;
+
+  scooter.traverse(m => {
+    if (!m.isMesh) return;
+    const n = m.name.toLowerCase();
+    if (n.includes("tank")) parts.tank = m;
+    if (n.includes("fairing")) parts.fairing = m;
+    if (n.includes("wheel")) parts.wheel.push(m);
+    m.material = material;
+  });
+
+  scene.add(scooter);
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+  if (scooter) scooter.rotation.y += 0.002;
+  renderer.render(scene, camera);
+}
+animate();
+
+window.selectPart = p => selectedPart = p;
+
+window.setMode = m => {
+  mode = m;
+  if (m === "metallic") material.metalness = 0.7;
+  if (m === "pearl") material.metalness = 0.4;
+  if (m === "chrome") material.metalness = 1.0;
+};
+
+["hue","bright","gloss"].forEach(id =>
+  document.getElementById(id).addEventListener("input", updateColor)
+);
+
+function updateColor(){
+  const h = hue.value / 360;
+  const b = bright.value / 100;
+  const g = gloss.value / 100;
+
+  material.color.setHSL(h, 1, b);
+  material.roughness = 1 - g;
+}
+
+window.captureImage = () => {
+  const img = renderer.domElement.toDataURL("image/png");
+  const a = document.createElement("a");
+  a.href = img;
+  a.download = "AT-Chrome-Lab.png";
+  a.click();
+};
+
+window.saveFormula = () => {
+  const data = {
+    shop:"AT Chrome Lab",
+    part:selectedPart,
+    mode,
+    color: material.color.getHexString(),
+    date:new Date().toLocaleString()
+  };
+  let list = JSON.parse(localStorage.getItem("formulas")) || [];
+  list.push(data);
+  localStorage.setItem("formulas", JSON.stringify(list));
+  localStorage.setItem("lastFormula", JSON.stringify(data));
+  alert("บันทึกสูตรเรียบร้อย");
+};
+
+window.sendLine = () => {
+  const msg = `
+AT Chrome Lab 🏍️
+ชิ้นส่วน: ${selectedPart}
+โหมดสี: ${mode}
+สี: #${material.color.getHexString()}
+`;
+  window.open("https://line.me/R/msg/text/?" + encodeURIComponent(msg));
+};
