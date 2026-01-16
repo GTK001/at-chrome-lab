@@ -34,17 +34,21 @@ const material = new THREE.MeshPhysicalMaterial({
 new GLTFLoader().load("3d/scooter.glb", gltf => {
   scooter = gltf.scene;
 
-  scooter.traverse(m => {
-    if (!m.isMesh) return;
-    const n = m.name.toLowerCase();
-    if (n.includes("tank")) parts.tank = m;
-    if (n.includes("fairing")) parts.fairing = m;
-    if (n.includes("wheel")) parts.wheel.push(m);
-    m.material = material;
+  // ✅ ปรับตำแหน่ง + ขนาด (สำคัญมาก)
+  scooter.scale.set(1.5, 1.5, 1.5);
+  scooter.position.set(0, -0.8, 0);
+
+  scooter.traverse(obj => {
+    if (obj.isMesh) {
+      obj.material = material;
+      obj.castShadow = true;
+      obj.receiveShadow = true;
+    }
   });
 
   scene.add(scooter);
 });
+
 
 function animate(){
   requestAnimationFrame(animate);
