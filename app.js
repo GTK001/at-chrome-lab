@@ -1,30 +1,3 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x111111);
-
-const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-camera.position.set(0, 1, 3);
-
-const renderer = new THREE.WebGLRenderer({ antialias:true });
-renderer.setSize(800, 600);
-document.getElementById("canvas3d").appendChild(renderer.domElement);
-
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1));
-
-function animate(){
-  requestAnimationFrame(animate);
-  cube.rotation.y += 0.01;
-  renderer.render(scene, camera);
-}
-animate();
-
-
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/loaders/GLTFLoader.js";
